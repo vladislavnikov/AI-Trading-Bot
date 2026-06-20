@@ -5,10 +5,12 @@
     "start": "npm run build && electron ."
   },
   "dependencies": {
-    "electron": "^42.3.3"
+    "electron": "^42.3.3",
+    "screenshot-desktop": "^1.15.4"
   },
   "devDependencies": {
     "@types/node": "^25.9.2",
+    "@types/screenshot-desktop": "^1.15.0",
     "typescript": "^6.0.3"
   }
 }
