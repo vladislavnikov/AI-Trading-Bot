@@ -33,3 +33,12 @@ export async function captureScreen(): Promise<Buffer> {
   deleteOldestIfNeeded();
   return img;
 }
+
+export function clearScreenshotsDir(): void {
+  if (fs.existsSync(SCREENSHOTS_DIR)) {
+    fs.readdirSync(SCREENSHOTS_DIR).forEach((file) => {
+      fs.unlinkSync(path.join(SCREENSHOTS_DIR, file));
+    });
+  }
+  files.length = 0;
+}

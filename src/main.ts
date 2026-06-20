@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
-import { captureScreen } from "./services/captureService";
+import { captureScreen, clearScreenshotsDir } from "./services/captureService";
 
 let captureInterval: NodeJS.Timeout | null = null;
 
@@ -35,8 +35,10 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  clearScreenshotsDir()
   createWindow();
   startCapturing();
+  //ToDO: Enhance for ai servic
 });
 
 app.on("window-all-closed", () => {
