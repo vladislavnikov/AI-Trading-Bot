@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import { captureScreen, clearScreenshotsDir } from "./services/captureService";
+import { analyzeScreen } from "./services/ai-service";
 
 let captureInterval: NodeJS.Timeout | null = null;
 
@@ -11,7 +12,7 @@ function startCapturing() {
     } catch (err) {
       console.error("[capture] Failed:", err);
     }
-  }, 1000);
+  }, 8000);
 }
 
 function stopCapturing() {
@@ -38,7 +39,16 @@ app.whenReady().then(() => {
   clearScreenshotsDir()
   createWindow();
   startCapturing();
-  //ToDO: Enhance for ai servic
+  
+   setInterval(async () => {
+    try {
+      const buffer = await captureScreen();
+      const response = await analyzeScreen(buffer, "What is on this screen?");
+      console.log('[ai]', response);
+    } catch (err) {
+      console.error('[main] Error:', err);
+    }
+  }, 6000);
 });
 
 app.on("window-all-closed", () => {

@@ -5,6 +5,7 @@
     "start": "npm run build && electron ."
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "electron": "^42.3.3",
     "screenshot-desktop": "^1.15.4"
   },
