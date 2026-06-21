@@ -1,17 +1,22 @@
-import axios from "axios";
-
-export async function analyzeScreen(
-  buffer: Buffer | null,
-  prompt: string = "Analyze the following screenshot and provide a detailed description of its contents.",
-): Promise<string> {
+export async function analyzeScreen(buffer: Buffer | null): Promise<string> {
   if (!buffer) return "";
 
-  const { data } = await axios.post("http://localhost:11434/api/generate", {
-    model: "moondream",
-    prompt,
-    images: [buffer.toString("base64")],
-    stream: false,
+  const response = await fetch("http://localhost:11434/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "moondream",
+      prompt:
+        "Analyze the following screenshot and provide a detailed description of its contents.",
+      images: [buffer.toString("base64")],
+      stream: false,
+    }),
   });
 
+  if (!response.ok) {
+    throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
   return data.response;
 }

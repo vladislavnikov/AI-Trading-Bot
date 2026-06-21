@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { app, BrowserWindow } from "electron";
-import { captureScreen, clearScreenshotsDir } from "./services/capture-service";
+import { captureScreen, clearScreenshotsDir } from "./services/captureService";
 import { analyzeScreen } from "./services/ai-service";
 
 let captureInterval: NodeJS.Timeout | null = null;
@@ -8,14 +8,16 @@ let analyzing = false;
 
 function startCapturing() {
   captureInterval = setInterval(async () => {
-    if (analyzing) return;
+    if (analyzing) {
+      console.log("[main] Still analyzing, skipping frame");
+      return;
+    }
     analyzing = true;
     try {
       const buffer = await captureScreen();
-      if (buffer) {
-        const response = await analyzeScreen(buffer);
-        console.log("[ai]", response);
-      }
+      if (!buffer) return;
+      const response = await analyzeScreen(buffer);
+      console.log("[ai]", response);
     } catch (err) {
       console.error("[main] Error:", err);
     } finally {
