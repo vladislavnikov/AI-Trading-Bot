@@ -1,14 +1,13 @@
-export async function analyzeScreen(
-  buffer: Buffer,
-  prompt: string = "What is on this screen? Summarize briefly.",
-): Promise<string> {
-  //ТoDo; axios
+export async function analyzeScreen(buffer: Buffer | null): Promise<string> {
+  if (!buffer) return "";
+
   const response = await fetch("http://localhost:11434/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "moondream",
-      prompt,
+      prompt:
+        "Analyze the following screenshot and provide a detailed description of its contents.",
       images: [buffer.toString("base64")],
       stream: false,
     }),

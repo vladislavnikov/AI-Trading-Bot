@@ -1,18 +1,29 @@
+import "dotenv/config";
 import { app, BrowserWindow } from "electron";
-import path from "path";
 import { captureScreen, clearScreenshotsDir } from "./services/captureService";
 import { analyzeScreen } from "./services/ai-service";
 
 let captureInterval: NodeJS.Timeout | null = null;
+let analyzing = false;
 
 function startCapturing() {
-  setInterval(async () => {
-    try {
-      await captureScreen();
-    } catch (err) {
-      console.error("[capture] Failed:", err);
+  captureInterval = setInterval(async () => {
+    if (analyzing) {
+      console.log("[main] Still analyzing, skipping frame");
+      return;
     }
-  }, 8000);
+    analyzing = true;
+    try {
+      const buffer = await captureScreen();
+      if (!buffer) return;
+      const response = await analyzeScreen(buffer);
+      console.log("[ai]", response);
+    } catch (err) {
+      console.error("[main] Error:", err);
+    } finally {
+      analyzing = false;
+    }
+  }, 10000);
 }
 
 function stopCapturing() {
@@ -31,24 +42,13 @@ function createWindow() {
       nodeIntegration: false,
     },
   });
-
   win.loadFile("index.html");
 }
 
 app.whenReady().then(() => {
-  clearScreenshotsDir()
+  clearScreenshotsDir();
   createWindow();
   startCapturing();
-  
-   setInterval(async () => {
-    try {
-      const buffer = await captureScreen();
-      const response = await analyzeScreen(buffer, "What is on this screen?");
-      console.log('[ai]', response);
-    } catch (err) {
-      console.error('[main] Error:', err);
-    }
-  }, 6000);
 });
 
 app.on("window-all-closed", () => {
